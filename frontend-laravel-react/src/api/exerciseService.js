@@ -1,57 +1,66 @@
-// src/api/exerciseService.js
 import apiClient from './config';
 
-// Datos de ejemplo para los ejercicios
-const mockExercises = [
-  { id: 1, session_id: 1, name: 'Sentadillas', sets: 4, reps: 10, weight: 70 },
-  { id: 2, session_id: 1, name: 'Peso muerto', sets: 3, reps: 8, weight: 80 },
-  { id: 3, session_id: 1, name: 'Extensiones de pierna', sets: 3, reps: 12, weight: 40 },
-  { id: 4, session_id: 2, name: 'Press de banca', sets: 4, reps: 8, weight: 60 },
-  { id: 5, session_id: 2, name: 'Dominadas', sets: 3, reps: 10, weight: 0 },
-  { id: 6, session_id: 2, name: 'Remo con barra', sets: 3, reps: 12, weight: 50 }
-];
-
-export const getExercisesBySession = async (sessionId) => {
-  // Simulación: en una implementación real, esto sería:
-  // return apiClient.get(`/training-sessions/${sessionId}/exercises`);
-  
-  const exercises = mockExercises.filter(e => e.session_id === parseInt(sessionId));
-  return Promise.resolve({ data: exercises });
-};
-
-export const createExercise = async (sessionId, exerciseData) => {
-  // Simulación: en una implementación real, esto sería:
-  // return apiClient.post(`/training-sessions/${sessionId}/exercises`, exerciseData);
-  
-  const newExercise = {
-    id: mockExercises.length + 1,
-    session_id: parseInt(sessionId),
-    ...exerciseData
-  };
-  mockExercises.push(newExercise);
-  return Promise.resolve({ data: newExercise });
-};
-
-export const updateExercise = async (sessionId, exerciseId, exerciseData) => {
-  // Simulación: en una implementación real, esto sería:
-  // return apiClient.patch(`/training-sessions/${sessionId}/exercises/${exerciseId}`, exerciseData);
-  
-  const index = mockExercises.findIndex(e => e.id === parseInt(exerciseId));
-  if (index !== -1) {
-    mockExercises[index] = { ...mockExercises[index], ...exerciseData };
-    return Promise.resolve({ data: mockExercises[index] });
+/**
+ * Obtiene todos los ejercicios disponibles.
+ * @returns {Promise} Promesa con la respuesta
+ */
+export const getAllExercises = async () => {
+  try {
+    const response = await apiClient.get('/exercises');
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener los ejercicios:', error);
+    throw error;
   }
-  return Promise.reject(new Error('Ejercicio no encontrado'));
 };
 
-export const deleteExercise = async (sessionId, exerciseId) => {
-  // Simulación: en una implementación real, esto sería:
-  // return apiClient.delete(`/training-sessions/${sessionId}/exercises/${exerciseId}`);
-  
-  const index = mockExercises.findIndex(e => e.id === parseInt(exerciseId));
-  if (index !== -1) {
-    mockExercises.splice(index, 1);
-    return Promise.resolve({ success: true });
+/**
+ * Obtiene un ejercicio específico por su ID.
+ * @param {number} id - ID del ejercicio
+ * @returns {Promise} Promesa con la respuesta
+ */
+export const getExercise = async (id) => {
+  try {
+    const response = await apiClient.get(`/exercises/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error al obtener el ejercicio ${id}:`, error);
+    throw error;
   }
-  return Promise.reject(new Error('Ejercicio no encontrado'));
+};
+
+/**
+ * Busca ejercicios por grupo muscular.
+ * @param {string} muscleGroup - Grupo muscular a buscar
+ * @returns {Promise} Promesa con la respuesta
+ */
+export const getExercisesByMuscleGroup = async (muscleGroup) => {
+  try {
+    const response = await apiClient.get(`/exercises/muscle-group/${muscleGroup}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error al obtener ejercicios del grupo muscular ${muscleGroup}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Obtiene todos los grupos musculares disponibles.
+ * @returns {Promise} Promesa con la respuesta
+ */
+export const getMuscleGroups = async () => {
+  try {
+    const response = await apiClient.get('/exercises/muscle-groups');
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener los grupos musculares:', error);
+    throw error;
+  }
+};
+
+export default {
+  getAllExercises,
+  getExercise,
+  getExercisesByMuscleGroup,
+  getMuscleGroups
 };

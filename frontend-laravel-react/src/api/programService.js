@@ -1,82 +1,104 @@
-// src/api/programService.js
 import apiClient from './config';
 
-// Datos de ejemplo para trabajar sin la API real
-const mockPrograms = [
-  { 
-    id: 1, 
-    name: 'Programa de fuerza', 
-    description: 'Entrenamiento enfocado en ganancia de fuerza',
-    duration_weeks: 12,
-    type: 'strength',
-    created_at: '2025-01-15'
-  },
-  { 
-    id: 2, 
-    name: 'Cardio intensivo', 
-    description: 'Programa para mejorar resistencia cardiovascular',
-    duration_weeks: 8,
-    type: 'cardio',
-    created_at: '2025-01-20'
-  },
-  { 
-    id: 3, 
-    name: 'Pérdida de peso', 
-    description: 'Entrenamiento para reducir grasa corporal',
-    duration_weeks: 16,
-    type: 'weight-loss',
-    created_at: '2025-02-05'
-  }
-];
-
+/**
+ * Obtiene todos los programas del usuario actual.
+ * @returns {Promise} Promesa con la respuesta
+ */
 export const getPrograms = async () => {
-  // Simulación: en una implementación real, esto sería:
-  // return apiClient.get('/programs');
-  
-  return Promise.resolve({ data: mockPrograms });
+  try {
+    const response = await apiClient.get('/programs');
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener los programas:', error);
+    throw error;
+  }
 };
 
+/**
+ * Obtiene un programa específico por su ID.
+ * @param {number} id - ID del programa
+ * @returns {Promise} Promesa con la respuesta
+ */
 export const getProgram = async (id) => {
-  // Simulación: en una implementación real, esto sería:
-  // return apiClient.get(`/programs/${id}`);
-  
-  const program = mockPrograms.find(p => p.id === parseInt(id));
-  return Promise.resolve({ data: program });
+  try {
+    const response = await apiClient.get(`/programs/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error al obtener el programa ${id}:`, error);
+    throw error;
+  }
 };
 
+/**
+ * Crea un nuevo programa de entrenamiento.
+ * @param {Object} programData - Datos del programa
+ * @param {number} programData.training_frequency - Frecuencia de entrenamiento (días por semana)
+ * @param {number} programData.training_duration - Duración del programa (en meses)
+ * @param {string} programData.start_date - Fecha de inicio (YYYY-MM-DD)
+ * @param {string} programData.estimated_end_date - Fecha estimada de finalización (YYYY-MM-DD)
+ * @returns {Promise} Promesa con la respuesta
+ */
 export const createProgram = async (programData) => {
-  // Simulación: en una implementación real, esto sería:
-  // return apiClient.post('/programs', programData);
-  
-  const newProgram = {
-    id: mockPrograms.length + 1,
-    ...programData,
-    created_at: new Date().toISOString().split('T')[0]
-  };
-  mockPrograms.push(newProgram);
-  return Promise.resolve({ data: newProgram });
+  try {
+    const response = await apiClient.post('/programs', programData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear el programa:', error);
+    throw error;
+  }
 };
 
+/**
+ * Actualiza un programa existente.
+ * @param {number} id - ID del programa
+ * @param {Object} programData - Datos a actualizar
+ * @returns {Promise} Promesa con la respuesta
+ */
 export const updateProgram = async (id, programData) => {
-  // Simulación: en una implementación real, esto sería:
-  // return apiClient.patch(`/programs/${id}`, programData);
-  
-  const index = mockPrograms.findIndex(p => p.id === parseInt(id));
-  if (index !== -1) {
-    mockPrograms[index] = { ...mockPrograms[index], ...programData };
-    return Promise.resolve({ data: mockPrograms[index] });
+  try {
+    const response = await apiClient.patch(`/programs/${id}`, programData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error al actualizar el programa ${id}:`, error);
+    throw error;
   }
-  return Promise.reject(new Error('Programa no encontrado'));
 };
 
+/**
+ * Elimina un programa.
+ * @param {number} id - ID del programa
+ * @returns {Promise} Promesa con la respuesta
+ */
 export const deleteProgram = async (id) => {
-  // Simulación: en una implementación real, esto sería:
-  // return apiClient.delete(`/programs/${id}`);
-  
-  const index = mockPrograms.findIndex(p => p.id === parseInt(id));
-  if (index !== -1) {
-    mockPrograms.splice(index, 1);
-    return Promise.resolve({ success: true });
+  try {
+    const response = await apiClient.delete(`/programs/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error al eliminar el programa ${id}:`, error);
+    throw error;
   }
-  return Promise.reject(new Error('Programa no encontrado'));
+};
+
+/**
+ * Obtiene las estadísticas del programa.
+ * @param {number} id - ID del programa
+ * @returns {Promise} Promesa con la respuesta
+ */
+export const getProgramStats = async (id) => {
+  try {
+    const response = await apiClient.get(`/programs/${id}/stats`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error al obtener estadísticas del programa ${id}:`, error);
+    throw error;
+  }
+};
+
+export default {
+  getPrograms,
+  getProgram,
+  createProgram,
+  updateProgram,
+  deleteProgram,
+  getProgramStats
 };
