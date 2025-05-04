@@ -1,20 +1,23 @@
-// pages/Register.jsx
-import RegisterForm from '../features/auth/RegisterForm';
+// src/pages/Register.jsx
+import { Link } from 'react-router-dom';
+import RegisterForm from '../components/RegisterForm';
 
 const RegisterPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Fitness Tracker App
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Crea una nueva cuenta
-          </p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+        <h1 className="text-2xl font-bold text-center mb-6">Crear Cuenta</h1>
         
         <RegisterForm />
+        
+        <div className="text-center mt-6">
+          <p className="text-sm text-gray-600">
+            ¿Ya tienes una cuenta?{' '}
+            <Link to="/login" className="text-blue-500 hover:text-blue-700">
+              Inicia sesión aquí
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
