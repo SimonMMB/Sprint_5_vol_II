@@ -1,45 +1,66 @@
-// Vamos a crear context/AuthContext.jsx
+// src/context/AuthContext.jsx
 import { createContext, useState, useEffect, useContext } from 'react';
-import { login as loginService, logout as logoutService } from '../api/authService';
+import { getCurrentUser } from '../api/authService';
 
+// Crear el contexto
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  
-  // Al cargar la aplicación, verificar si hay un token guardado
-  useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      // Aquí podríamos hacer una petición a /auth/me para obtener los datos del usuario
-      // Por ahora, simplemente establecemos que hay un usuario autenticado
-      setUser({ authenticated: true });
-    }
-    setLoading(false);
-  }, []);
-  
-  const login = async (credentials) => {
-    const response = await loginService(credentials);
-    localStorage.setItem('auth_token', response.token);
-    setUser(response.user);
-    return response;
-  };
-  
-  const logout = async () => {
-    await logoutService();
-    localStorage.removeItem('auth_token');
-    setUser(null);
-  };
-  
-  return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-// Hook personalizado para usar el contexto de autenticación
+// Hook personalizado para usar el contexto
 export const useAuth = () => {
   return useContext(AuthContext);
+};
+
+// Proveedor del contexto
+export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Verificar si hay un usuario autenticado al cargar la aplicación
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        // Verificar si hay un token en localStorage
+        const token = localStorage.getItem('auth_token');
+        
+        if (token) {
+          // Obtener datos del usuario actual
+          const userData = await getCurrentUser();
+          setCurrentUser(userData);
+        }
+      } catch (error) {
+        // Si hay un error, eliminar el token (podría estar expirado)
+        localStorage.removeItem('auth_token');
+        setCurrentUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUser();
+  }, []);
+
+  // Función para actualizar el usuario después de login/register
+  const setUser = (user) => {
+    setCurrentUser(user);
+  };
+
+  // Función para logout
+  const logoutUser = () => {
+    localStorage.removeItem('auth_token');
+    setCurrentUser(null);
+  };
+
+  // Valor a compartir en el contexto
+  const value = {
+    currentUser,
+    setUser,
+    logoutUser,
+    isAuthenticated: !!currentUser
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 };
