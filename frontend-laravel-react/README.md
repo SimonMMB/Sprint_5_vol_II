@@ -12,6 +12,7 @@ This project consists of a React frontend developed to consume a REST API create
 - [Authentication System](#authentication-system)
 - [Development Process](#development-process)
 - [Next Steps](#next-steps)
+- [Presentation](#presentation)
 
 ## Technologies
 
@@ -393,6 +394,7 @@ The following features and improvements are planned for future development:
 - Add offline capabilities with service workers
 - Optimize performance with lazy loading and code splitting
 
+## Presentation
 
 # Desarrollo de Frontend React para API REST Laravel con Claude
 
