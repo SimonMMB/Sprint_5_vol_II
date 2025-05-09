@@ -29,11 +29,23 @@ apiClient.interceptors.response.use(
   error => {
     // Manejo de errores de autenticación
     if (error.response && error.response.status === 401) {
+      // Limpiamos los datos de autenticación
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirigir al login si no está autenticado
-      window.location.href = '/login';
+      
+      // Solo redirigimos al login si no estamos ya en la página de login o registro
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        console.log('Sesión expirada, redirigiendo a login...');
+        
+        // Usamos history.pushState en lugar de window.location para evitar recargas completas
+        // que podrían interrumpir el flujo de React Router
+        window.history.pushState({}, '', '/login');
+        // Disparamos un evento para que React Router detecte el cambio
+        window.dispatchEvent(new Event('popstate'));
+      }
     }
+    
+    // Aseguramos que el error se propague para que los componentes puedan manejarlo
     return Promise.reject(error);
   }
 );

@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faUserPlus, faDumbbell, faEnvelope, 
-  faLock, faUser, faUserShield 
+  faLock, faUser
 } from '@fortawesome/free-solid-svg-icons';
 
 const Register = () => {
@@ -15,7 +15,7 @@ const Register = () => {
     email: '',
     password: '',
     password_confirmation: '',
-    role: 'trainee' // Por defecto, el rol es trainee
+    role: 'trainee' // Por defecto, el rol es trainee - ahora fijo
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -80,37 +80,24 @@ const Register = () => {
     setLoading(true);
     
     try {
-      await register(formData);
+      // Intentar registrar
+      const result = await register(formData);
       
-      // Si llegamos aquí, significa que el registro fue exitoso
-      toast.success('¡Registro exitoso! Bienvenido a Fitness Tracker');
+      toast.success('¡Registro exitoso!');
       
-      // Esperar un momento para que el token se guarde correctamente
-      setTimeout(() => {
-        // Comprobar nuevamente si estamos autenticados
-        if (isAuthenticated()) {
-          // Redireccionar al dashboard
-          navigate('/dashboard', { replace: true });
-        } else {
-          toast.error('Error al guardar la sesión. Inténtalo nuevamente.');
-        }
-      }, 500);
+      // Si tenemos un token, vamos al dashboard directamente
+      if (result.token) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        // Si no hay token, vamos a login
+        navigate('/login', { 
+          replace: true,
+          state: { email: formData.email } 
+        });
+      }
     } catch (error) {
-      console.error('Error al registrar usuario:', error);
-      let errorMessage = 'Error al registrar usuario';
-      
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      toast.error(errorMessage);
-      
-      // Si hay errores de validación del servidor
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      }
+      console.error('Error al registrar:', error);
+      toast.error(error.message || 'Error al registrar usuario');
     } finally {
       setLoading(false);
     }
@@ -124,7 +111,7 @@ const Register = () => {
             <FontAwesomeIcon icon={faDumbbell} className="text-blue-500 text-5xl" />
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Fitness Tracker
+            STAY STRONG
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Crea una nueva cuenta
@@ -241,31 +228,7 @@ const Register = () => {
               )}
             </div>
             
-            <div className="mb-4">
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                Tipo de usuario
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FontAwesomeIcon icon={faUserShield} className="text-gray-400" />
-                </div>
-                <select
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className={`appearance-none rounded-md block w-full pl-10 py-2 border ${
-                    errors.role ? 'border-red-500' : 'border-gray-300'
-                  } text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10`}
-                >
-                  <option value="trainee">Usuario (Entrenando)</option>
-                  <option value="trainer">Entrenador</option>
-                </select>
-              </div>
-              {errors.role && (
-                <p className="mt-1 text-sm text-red-600">{errors.role}</p>
-              )}
-            </div>
+            <input type="hidden" name="role" value="trainee" />
           </div>
 
           <div>

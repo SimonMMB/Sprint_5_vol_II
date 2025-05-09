@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { login, isAuthenticated } from '../../api/authService';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignInAlt, faDumbbell, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faSignInAlt, faDumbbell, faEnvelope, faLock 
+} from '@fortawesome/free-solid-svg-icons';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: '',
+  const location = useLocation();
+  
+  // Utilizar el email del state si está disponible (cuando se viene desde register)
+  const initialEmail = location.state?.email || '';
+  
+  const [credentials, setCredentials] = useState({
+    email: initialEmail,
     password: ''
   });
   const [loading, setLoading] = useState(false);
@@ -23,8 +30,8 @@ const Login = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setCredentials({
+      ...credentials,
       [name]: value
     });
     
@@ -40,13 +47,13 @@ const Login = () => {
   const validate = () => {
     const newErrors = {};
     
-    if (!formData.email) {
+    if (!credentials.email) {
       newErrors.email = 'El correo electrónico es obligatorio';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(credentials.email)) {
       newErrors.email = 'Correo electrónico inválido';
     }
     
-    if (!formData.password) {
+    if (!credentials.password) {
       newErrors.password = 'La contraseña es obligatoria';
     }
     
@@ -64,37 +71,17 @@ const Login = () => {
     setLoading(true);
     
     try {
-      await login(formData);
+      // Intentar login
+      await login(credentials);
       
-      // Si llegamos aquí, significa que la autenticación fue exitosa
+      // Si llegamos aquí, el login fue exitoso
       toast.success('¡Inicio de sesión exitoso!');
       
-      // Esperar un momento para que el token se guarde correctamente
-      setTimeout(() => {
-        // Comprobar nuevamente si estamos autenticados
-        if (isAuthenticated()) {
-          // Redireccionar al dashboard
-          navigate('/dashboard', { replace: true });
-        } else {
-          toast.error('Error al guardar la sesión. Inténtalo nuevamente.');
-        }
-      }, 500);
+      // Redireccionar al dashboard
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
-      let errorMessage = 'Error al iniciar sesión';
-      
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      toast.error(errorMessage);
-      
-      // Si hay errores de validación del servidor
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      }
+      toast.error(error.message || 'Credenciales incorrectas');
     } finally {
       setLoading(false);
     }
@@ -108,7 +95,7 @@ const Login = () => {
             <FontAwesomeIcon icon={faDumbbell} className="text-blue-500 text-5xl" />
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Fitness Tracker
+            STAY STRONG
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Inicia sesión en tu cuenta
@@ -131,7 +118,7 @@ const Login = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  value={formData.email}
+                  value={credentials.email}
                   onChange={handleChange}
                   className={`appearance-none rounded-md block w-full pl-10 py-2 border ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
@@ -158,7 +145,7 @@ const Login = () => {
                   type="password"
                   autoComplete="current-password"
                   required
-                  value={formData.password}
+                  value={credentials.password}
                   onChange={handleChange}
                   className={`appearance-none rounded-md block w-full pl-10 py-2 border ${
                     errors.password ? 'border-red-500' : 'border-gray-300'
@@ -175,20 +162,20 @@ const Login = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
-                id="remember-me"
-                name="remember-me"
+                id="remember_me"
+                name="remember_me"
                 type="checkbox"
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="remember_me" className="ml-2 block text-sm text-gray-900">
                 Recordarme
               </label>
             </div>
 
             <div className="text-sm">
-              <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
                 ¿Olvidaste tu contraseña?
-              </a>
+              </Link>
             </div>
           </div>
 

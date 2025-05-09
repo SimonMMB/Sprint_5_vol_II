@@ -25,7 +25,7 @@ export const getTrainingSession = async (id) => {
     const response = await apiClient.get(`/training-sessions/${id}`);
     return response.data;
   } catch (error) {
-    console.error(`Error al obtener la sesión de entrenamiento ${id}:`, error);
+    console.error(`Error al obtener la sesión ${id}:`, error);
     throw error;
   }
 };

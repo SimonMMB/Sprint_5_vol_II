@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { logout, getCurrentUser, hasRole } from '../../api/authService';
+import { getCurrentUser, hasRole } from '../../api/authService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faHome, faDumbbell, faUser, faUsers, 
@@ -13,11 +13,19 @@ const Navbar = () => {
   const user = getCurrentUser();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     try {
-      await logout();
+      // Primero eliminar tokens de autenticación
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+      
+      // Mostrar mensaje de éxito
       toast.success('Sesión cerrada correctamente');
-      navigate('/login');
+      
+      // Redirigir al login (usando replace para evitar volver atrás)
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
       toast.error('Error al cerrar sesión');
@@ -29,14 +37,14 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white">
+    <nav className="bg-blue-600 text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo y nombre */}
           <div className="flex-shrink-0">
             <Link to="/dashboard" className="flex items-center">
               <FontAwesomeIcon icon={faDumbbell} className="h-6 w-6 mr-2" />
-              <span className="font-bold text-xl">Fitness Tracker</span>
+              <span className="font-bold text-xl">STAY STRONG</span>
             </Link>
           </div>
 

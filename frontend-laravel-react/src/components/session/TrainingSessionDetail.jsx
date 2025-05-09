@@ -25,6 +25,12 @@ const TrainingSessionDetail = () => {
       try {
         setLoading(true);
         const sessionData = await getTrainingSession(sessionId);
+        console.log('Respuesta completa de la API:', sessionData);
+        console.log('¿Tiene sessionExercises?', !!sessionData.sessionExercises);
+        if (sessionData.sessionExercises) {
+          console.log('Cantidad de ejercicios:', sessionData.sessionExercises.length);
+        }
+        
         setSession(sessionData);
         
         // Extraer ejercicios y configurar pesos iniciales
@@ -46,10 +52,10 @@ const TrainingSessionDetail = () => {
         setLoading(false);
       }
     };
-
+  
     fetchSessionData();
   }, [sessionId]);
-
+  
   // Formatear fecha
   const formatDate = (dateString) => {
     if (!dateString) return '';
